@@ -1,0 +1,45 @@
+import firebase_admin
+from firebase_admin import credentials, db
+from flask import Flask, render_template, request
+IsFirm = "off"
+cred = credentials.Certificate("Key.json")
+firebase_admin.initialize_app(cred, {'databaseURL': 'https://greenwend-1d975-default-rtdb.asia-southeast1.firebasedatabase.app/'})
+
+# Access Realtime Database
+ref = db.reference()
+
+# Example data to be written
+getTrue = {
+    "Firmware_Version/7abfwbAmqAX6rD23freaSZNpVny2/Update": True
+}
+getFalse = {
+    "Firmware_Version/7abfwbAmqAX6rD23freaSZNpVny2/Update": False
+}
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/button', methods=['POST'])
+def button():
+    status = request.form['status']
+    print(f'Button Status: {status}')
+    if(status== "on"):
+        ref.update(getTrue)
+    else:
+        ref.update(getFalse)
+    if(status == 'on'):
+        return render_template('success.html', status=status)
+    else:
+        return render_template('DisabledUpdate.html', status=status)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+# Initialize Firebase with your service account key
+
+    # Write data to the specified path
+
+
+print("Data written successfully to Firebase Realtime Database!")
